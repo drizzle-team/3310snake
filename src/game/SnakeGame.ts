@@ -168,16 +168,16 @@ export class SnakeGame {
 
     window.addEventListener("keydown", preventControlButtons, false);
 
-    const key = event.keyCode;
+    const code = event.code;
     const lastDirection = this.directionQueue[this.directionQueue.length - 1];
 
-    if (key === 37 && lastDirection !== "RIGHT") {
+    if (code === "ArrowLeft" && lastDirection !== "RIGHT") {
       this.enqueueDirection("LEFT");
-    } else if (key === 38 && lastDirection !== "DOWN") {
+    } else if (code === "ArrowUp" && lastDirection !== "DOWN") {
       this.enqueueDirection("UP");
-    } else if (key === 39 && lastDirection !== "LEFT") {
+    } else if (code === "ArrowRight" && lastDirection !== "LEFT") {
       this.enqueueDirection("RIGHT");
-    } else if (key === 40 && lastDirection !== "UP") {
+    } else if (code === "ArrowDown" && lastDirection !== "UP") {
       this.enqueueDirection("DOWN");
     }
   }
