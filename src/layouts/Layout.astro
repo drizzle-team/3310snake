@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="robots" content="index,follow" />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+		/>
+		<link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Nokia Snake 2</title>
+		<meta
+			name="description"
+			content="Nokia Snake 2"
+		/>
+		<meta property="og:title" content="Nokia Snake 2" />
+		<meta
+			property="og:description"
+			content="Nokia Snake 2"
+		/>
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
+
+<style is:global>
+	@font-face {
+		font-family: "Nokia";
+		src: url("../fonts/n3310.ttf") format("truetype");
+	}
+
+	body {
+		margin: 0;
+	}
+
+	body * {
+		user-select: none;
+		box-sizing: border-box;
+		font-family: "Nokia";
+		font-weight: 800;
+		margin: 0;
+		padding: 0;
+	}
+</style>
