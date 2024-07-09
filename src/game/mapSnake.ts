@@ -150,7 +150,7 @@ export const gameSegments = {
     [0, 0, 0, 0],
   ],
   superFood: {
-    0: {
+    'superFood1': {
       0: [
         [0, 0, 1, 1],
         [1, 1, 1, 1],
@@ -164,7 +164,7 @@ export const gameSegments = {
         [0, 1, 0, 1],
       ]
     },
-    1: {
+    'superFood2': {
       0: [
         [1, 1, 0, 0],
         [1, 1, 0, 0],
@@ -178,7 +178,7 @@ export const gameSegments = {
         [1, 0, 1, 0],
       ]
     },
-    2: {
+    'superFood3': {
       0: [
         [0, 0, 0, 0],
         [1, 0, 0, 1],
@@ -192,7 +192,7 @@ export const gameSegments = {
         [1, 1, 1, 1],
       ]
     },
-    3: {
+    'superFood4': {
       0: [
         [0, 1, 0, 1],
         [1, 0, 1, 1],
@@ -206,7 +206,7 @@ export const gameSegments = {
         [0, 1, 0, 0],
       ]
     },
-    4: {
+    'superFood5': {
       0: [
         [0, 0, 0, 0],
         [1, 0, 0, 0],

@@ -30,7 +30,7 @@ export class SnakeGame {
   gridHeight: number;
   eatenFood: { x: number; y: number }[];
   gameOver: boolean;
-  directionQueue: string[];
+  directionQueue: Array<'UP' | 'LEFT' | 'RIGHT' | 'DOWN'>;
   score: number;
   difficulty: keyof typeof difficulties;
   gridCoordinates: { x: number; y: number }[];
@@ -42,6 +42,23 @@ export class SnakeGame {
   eatenFoodCount: number;
   smallSquareCount: number;
   smallSquareSize: number;
+  replay: {
+    events: Array <{
+      index: number;
+      type: 'direction';
+      direction: 'UP' | 'LEFT' | 'RIGHT' | 'DOWN';
+    } | {
+      index: number;
+      type: 'food' | keyof typeof gameSegments.superFood;
+      x: number;
+      y: number;
+    }>
+    difficulty: keyof typeof difficulties,
+    score: number;
+  } | null;
+  isReplay: boolean;
+  tick: number;
+  isAboutToDie: boolean;
 
   constructor() {
     this.canvas = document.getElementById("game-canvas") as HTMLCanvasElement;
@@ -61,6 +78,7 @@ export class SnakeGame {
     this.eatenFood = [];
     this.score = 0;
     this.gameOver = true;
+    this.isReplay = false;
     this.difficulty = 2;
     this.smallSquareCount = 4;
     this.smallSquareSize = 4;
@@ -68,6 +86,9 @@ export class SnakeGame {
       this.gridWidth,
       this.gridHeight,
     );
+    this.replay = null;
+    this.tick = 0;
+    this.isAboutToDie = false;
     this.resizeCanvas();
     this.redraw();
     window.addEventListener("resize", this.resizeCanvas.bind(this));
@@ -75,9 +96,22 @@ export class SnakeGame {
   }
 
   startGame() {
+    this.replay = {
+      difficulty: this.difficulty,
+      score: 0,
+      events: []
+    }
     this.changeScore(0);
     this.gameOver = false;
     this.gameLoop();
+  }
+
+  playReplay(replay: typeof this.replay) {
+    this.isReplay = true;
+    this.gameOver = false;
+    this.changeScore(0);
+    this.replay = {...replay!};
+    this.replayLoop();
   }
 
   createInitialSnake(length: number) {
@@ -131,7 +165,13 @@ export class SnakeGame {
 
     const foodPosition =
       freeSegments[Math.floor(Math.random() * freeSegments.length)];
-    this.food = foodPosition;
+
+    if (!this.isReplay) {
+      this.food = foodPosition;
+      this.replay!.events.push({index: this.tick + 1, type: "food", ...foodPosition})
+    } else {
+      this.food = {x: 99, y: 99}
+    }
 
     if (this.eatenFoodCount === 5) {
       let superFoodFreeSegments: { x: number, y:number }[][] = []
@@ -154,38 +194,77 @@ export class SnakeGame {
 
       if (!superFoodFreeSegments.length) return;
 
-      this.superFood = {
-        segments: superFoodFreeSegments[Math.floor(Math.random() * superFoodFreeSegments.length)],
-        type: Math.floor(Math.random() * 5) as keyof typeof gameSegments.superFood,
-      };
-      this.superFoodCount = 20;
-      this.eatenFoodCount = 0;
+      const superFoodSegments = superFoodFreeSegments[Math.floor(Math.random() * superFoodFreeSegments.length)];
+      const superFoodType = Object.keys(gameSegments.superFood)[Math.floor(Math.random() * 5)] as keyof typeof gameSegments.superFood;
+
+      if (!this.isReplay) {
+        this.replay!.events.push({index: this.tick + 1, type: superFoodType, ...superFoodSegments[0]})
+        this.superFood = {
+          segments: superFoodSegments,
+          type: superFoodType
+        };
+        this.superFoodCount = 20;
+        this.eatenFoodCount = 0;
+      } else {
+        this.superFood = null;
+      }
     }
   }
 
   changeDirection(event: KeyboardEvent) {
-    if (this.gameOver) return;
+    if (this.gameOver || this.isReplay) return;
 
     window.addEventListener("keydown", preventControlButtons, false);
 
     const code = event.code;
     const lastDirection = this.directionQueue[this.directionQueue.length - 1];
 
-    if (code === "ArrowLeft" && lastDirection !== "RIGHT") {
+    if ((code === "ArrowLeft" || code === "KeyA") && lastDirection !== "RIGHT") {
       this.enqueueDirection("LEFT");
-    } else if (code === "ArrowUp" && lastDirection !== "DOWN") {
+    } else if ((code === "ArrowUp" || code === "KeyW") && lastDirection !== "DOWN") {
       this.enqueueDirection("UP");
-    } else if (code === "ArrowRight" && lastDirection !== "LEFT") {
+    } else if ((code === "ArrowRight" || code === "KeyD") && lastDirection !== "LEFT") {
       this.enqueueDirection("RIGHT");
-    } else if (code === "ArrowDown" && lastDirection !== "UP") {
+    } else if ((code === "ArrowDown" || code === "KeyS") && lastDirection !== "UP") {
       this.enqueueDirection("DOWN");
     }
   }
 
-  enqueueDirection(newDirection: string) {
+  enqueueDirection(newDirection: typeof this.directionQueue[number]) {
     if (this.directionQueue.length < 3) {
       this.directionQueue.push(newDirection);
     }
+  }
+
+  replayLoop() {
+    setTimeout(() => {
+      if (this.isReplay && !this.gameOver) {
+        const replayEvents = this.replay!.events.filter(({index}) => index === this.tick)
+        replayEvents.forEach((event) => {
+          if (event.type === "direction") {
+            this.directionQueue = [event.direction]
+          } else if (event.type === "food") {
+            this.food = {x: event.x, y: event.y};
+          } else {
+            this.superFood = {
+              segments: [
+                {x: event.x, y: event.y},
+                {x: event.x + 1, y: event.y},
+              ],
+              type: event.type,
+            }
+            this.superFoodCount = 20;
+            this.eatenFoodCount = 0
+          }
+        })
+        this.moveSnake();
+        this.countdownSuperFood();
+        this.redraw();
+        this.checkGameOver();
+        this.tick++
+        this.replayLoop();
+      }
+    }, difficulties[this.replay!.difficulty].speed);
   }
 
   gameLoop() {
@@ -195,6 +274,7 @@ export class SnakeGame {
         this.countdownSuperFood();
         this.redraw();
         this.checkGameOver();
+        this.tick++
         this.gameLoop();
       }
     }, difficulties[this.difficulty].speed);
@@ -247,10 +327,26 @@ export class SnakeGame {
   moveSnake() {
     const currentDirection = this.directionQueue[0];
     const head = { x: this.snake[0].x, y: this.snake[0].y };
+    const tail = { x: this.snake[this.snake.length -1].x, y: this.snake[this.snake.length -1].y }
     if (currentDirection === "RIGHT") head.x += 1;
     else if (currentDirection === "LEFT") head.x -= 1;
     else if (currentDirection === "UP") head.y -= 1;
     else if (currentDirection === "DOWN") head.y += 1;
+
+    if (this.snake.some((segment, index) => (
+      segment.x === head.x && segment.y === head.y && index !== this.snake.length - 1
+    ) && !this.isAboutToDie)) {
+        this.isAboutToDie = true;
+        if (this.directionQueue.length > 1) {
+          if (!this.isReplay) {
+            this.replay!.events.push({ index: this.tick + 1, type: 'direction', direction: this.directionQueue[1]})
+          }
+          this.directionQueue.shift();
+        }
+        return;
+    }
+
+    this.isAboutToDie = false;
 
     if (head.x === this.gridWidth) {
       head.x = 0;
@@ -268,7 +364,7 @@ export class SnakeGame {
 
     this.eatenFood = [
       ...this.eatenFood.filter((eatenFood) =>
-        this.snake.some(({ x, y }) => x === eatenFood.x && y === eatenFood.y),
+        !(tail.x === eatenFood.x && tail.y === eatenFood.y)
       ),
     ];
 
@@ -276,20 +372,33 @@ export class SnakeGame {
       this.eatenFood.unshift({ ...this.food });
       this.eatenFoodCount++;
       this.generateFood();
-      this.changeScore(this.score + difficulties[this.difficulty].multiplier);
+      if (this.isReplay) {
+        this.changeScore(this.score + difficulties[this.replay.difficulty].multiplier);
+      } else {
+        this.changeScore(this.score + difficulties[this.difficulty].multiplier);
+      }
     } else if (this.superFood && this.superFood.segments.some(({x, y}) => head.x === x && head.y === y)) {
       this.eatenFood.unshift({ ...head });
       this.eatenFoodCount = 0;
       this.superFood = null;
       this.superFoodCount = 0;
-      this.changeScore(
-        this.score + 5 * difficulties[this.difficulty].multiplier,
-      );
+      if (this.isReplay) {
+        this.changeScore(
+          this.score + 5 * difficulties[this.replay.difficulty].multiplier,
+        );
+      } else {
+        this.changeScore(
+          this.score + 5 * difficulties[this.difficulty].multiplier,
+        );
+      }
     } else {
       this.snake.pop();
     }
 
     if (this.directionQueue.length > 1) {
+      if (!this.isReplay) {
+        this.replay!.events.push({ index: this.tick + 1, type: 'direction', direction: this.directionQueue[1]})
+      }
       this.directionQueue.shift();
     }
   }
@@ -299,6 +408,7 @@ export class SnakeGame {
       .toString()
       .padStart(4, "0");
     this.score = score;
+    this.replay!.score = score;
   }
 
   drawSnake() {
@@ -429,6 +539,8 @@ export class SnakeGame {
     this.eatenFoodCount = 0;
     this.superFood = null;
     this.superFoodCount = 0;
+    this.tick = 0;
+    this.isReplay = false;
     this.food = { x: 16, y: 2 };
     this.redraw();
   }

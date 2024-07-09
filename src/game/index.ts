@@ -35,7 +35,16 @@ const startGame = () => {
   snakeGame.startGame();
 };
 
+const replayGame = () => {
+  if (snakeGame.replay) {
+    snakeGame.playReplay(snakeGame.replay);
+    document.querySelector(".game-start-screen")!.classList.add("hidden");
+    window.addEventListener("keydown", preventControlButtons, false);
+  }
+};
+
 document.getElementById("start-game")!.addEventListener("click", startGame);
+document.getElementById("replay-game")!.addEventListener("click", replayGame);
 
 document
   .getElementById("change-difficulty")!
@@ -48,6 +57,7 @@ window.addEventListener(
       e.preventDefault();
       snakeGame.gameOver = true;
       snakeGame.resetGame();
+      snakeGame.replay = null;
       const countdown = document.querySelector(".countdown")!;
 
       countdown.classList.add("hidden");
