@@ -373,7 +373,7 @@ export class SnakeGame {
       this.eatenFoodCount++;
       this.generateFood();
       if (this.isReplay) {
-        this.changeScore(this.score + difficulties[this.replay.difficulty].multiplier);
+        this.changeScore(this.score + difficulties[this.replay!.difficulty].multiplier);
       } else {
         this.changeScore(this.score + difficulties[this.difficulty].multiplier);
       }
@@ -384,7 +384,7 @@ export class SnakeGame {
       this.superFoodCount = 0;
       if (this.isReplay) {
         this.changeScore(
-          this.score + 5 * difficulties[this.replay.difficulty].multiplier,
+          this.score + 5 * difficulties[this.replay!.difficulty].multiplier,
         );
       } else {
         this.changeScore(
