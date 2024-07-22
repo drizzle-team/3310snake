@@ -61,6 +61,8 @@ const BusinessLogic: React.FC<{code?: string}> = ({code}) => {
   }
 
   const getReplayData = async (id: number) => {
+    if (!snakeGame.isReplay && snakeGame.tick)  return;
+
     const data = await getReplayById(id);
     setCurrentReplayId(id);
     playReplay(data);
@@ -220,10 +222,10 @@ const BusinessLogic: React.FC<{code?: string}> = ({code}) => {
       <div className={`toast ${isToastShown ? 'toast-visible' : ''}`}>
         <img src="/images/cup.png" alt='cup' />
         {toast?.type === 'unauthorized' && (
-          <span>New personal high score: {toast.score}<br/><a href={import.meta.env.PUBLIC_GITGUH_AUTH_LINK}>Sign in with GitHub</a> and save it on the leaderboard</span>
+          <span>New personal highscore: {toast.score}<br/><a href={import.meta.env.PUBLIC_GITGUH_AUTH_LINK}>Sign in with GitHub</a> and save it on the leaderboard</span>
         )}
         {toast?.type === 'authorized' && (
-          <span>New personal high score: {toast.score}<br/>You are on {toast.place} place in global leaderboard</span>
+          <span>New personal highscore: {toast.score}<br/>You are on {toast.place} place in global leaderboard</span>
         )}
       </div>
       <div className={`leaderboard-container ${open ? 'visible' : ''}`}>
