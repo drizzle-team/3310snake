@@ -110,6 +110,17 @@ const BusinessLogic: React.FC<{code?: string}> = ({code}) => {
     }
   };
 
+  const getDifficultyName = (value: 1 | 2 | 3) => {
+    switch (value) {
+      case 1:
+        return 'Easy';
+      case 2:
+        return 'Normal';
+      case 3:
+        return 'Hard';
+    }
+  };
+
   const startGame = () => {
     document.querySelector(".game-start-screen")!.classList.add("hidden");
     window.addEventListener("keydown", preventControlButtons, false);
@@ -257,29 +268,72 @@ const BusinessLogic: React.FC<{code?: string}> = ({code}) => {
           loading === 'global' ? (
             <div style={{margin: 'auto'}}>Loading...</div>
           ) : (
-            <table>
-              <tr>
-                <th style={{width: '10%'}}>#</th>
-                <th style={{width: '100%'}}>Name</th>
-                <th>Score</th>
-                <th><div style={{width: '16px', height: '16px'}}/> </th>
-              </tr>
+            <>
+              <div className="leaderboard-line">
+                <div>#</div>
+                <div>User</div>
+                <div>Score</div>
+                <div></div>
+              </div>
               <div className="scroll-block">
-                <table>
-                  {leaderboard?.map((item, index) => (
-                    <tr key={item.id}>
-                      <td style={{width: '10%'}}>{item.place}</td>
-                      <td style={{width: '100%'}}>
-                        <a
-                          className="user-link"
-                          href={`https://github.com/${item.user.name}`}
-                          target="_blank"
-                        >
-                          {item.user.name}
-                        </a>
-                      </td>
-                      <td>{item.score}</td>
-                      <td>
+                {leaderboard?.map((item, index) => (
+                  <div className="leaderboard-line" key={item.id}>
+                    <div>{item.place}</div>
+                    <div>
+                      <a
+                        className="user-link"
+                        href={`https://github.com/${item.user.name}`}
+                        target="_blank"
+                      >
+                        {item.user.name}
+                      </a>
+                    </div>
+                    <div>{item.score}</div>
+                    <div>
+                      {currentReplayId === item.id ? (
+                        <div style={{cursor: 'pointer', width: '100%', textAlign: 'right'}} onClick={stopGame}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                               fill="#000" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                               strokeLinejoin="round" className="feather feather-square">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                          </svg>
+                        </div>
+                      ) : (
+                        <div style={{cursor: 'pointer', width: '100%', textAlign: 'right'}} onClick={() => getReplayData(item.id)}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#000"
+                               stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                               className="feather feather-play">
+                            <polygon points="5 3 19 12 5 21 5 3"/>
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )
+        ) : (
+          !user ? (
+            <div style={{margin: 'auto'}}>Sing in to save your highscores</div>
+          ) : (
+            loading === 'personal' ? (
+              <div style={{margin: 'auto'}}>Loading...</div>
+            ) : (
+              <>
+                <div className="my-ranks-line">
+                  <div>#</div>
+                  <div>Difficulty</div>
+                  <div>Score</div>
+                  <div></div>
+                </div>
+                <div className="scroll-block">
+                  {myRanks?.ranks.map((item, index) => (
+                    <div className="my-ranks-line" key={item.id + 'myrank'}>
+                      <div>{item.place}</div>
+                      <div>{getDifficultyName(item.difficulty)}</div>
+                      <div>{item.score}</div>
+                      <div>
                         {currentReplayId === item.id ? (
                           <div style={{cursor: 'pointer', width: '100%', textAlign: 'right'}} onClick={stopGame}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -297,56 +351,11 @@ const BusinessLogic: React.FC<{code?: string}> = ({code}) => {
                             </svg>
                           </div>
                         )}
-                      </td>
-                    </tr>
+                      </div>
+                    </div>
                   ))}
-                </table>
-              </div>
-            </table>
-          )
-        ) : (
-          !user ? (
-            <div style={{margin: 'auto'}}>Sing in to save your highscores</div>
-          ) : (
-            loading === 'personal' ? (
-              <div style={{margin: 'auto'}}>Loading...</div>
-            ) : (
-              <table>
-                <tr>
-                  <th style={{width: '50%', textAlign: 'left'}}>Score</th>
-                  <th style={{textAlign: "center"}}>Place</th>
-                  <th style={{width: '50%', textAlign: "right"}}>Replay</th>
-                </tr>
-                <div className="scroll-block">
-                  <table>
-                    {myRanks?.ranks.map((item, index) => (
-                      <tr key={item.id + 'myrank'}>
-                        <td style={{width: '50%', textAlign: 'left'}}>{item.score}</td>
-                        <td style={{textAlign: "center"}}>{item.place}</td>
-                        <td style={{width: '50%'}}>
-                          {currentReplayId === item.id ? (
-                            <div style={{cursor: 'pointer', width: '100%', textAlign: 'right'}} onClick={stopGame}>
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                   fill="#000" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                                   strokeLinejoin="round" className="feather feather-square">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                              </svg>
-                            </div>
-                          ) : (
-                            <div style={{cursor: 'pointer', width: '100%', textAlign: 'right'}} onClick={() => getReplayData(item.id)}>
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#000"
-                                   stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                                   className="feather feather-play">
-                                <polygon points="5 3 19 12 5 21 5 3"/>
-                              </svg>
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </table>
                 </div>
-              </table>
+              </>
             )
           )
         )}

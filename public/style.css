@@ -85,38 +85,18 @@ button {
     text-decoration: underline;
 }
 
-table * {
-    text-align: left;
+.leaderboard-line {
+    display: grid;
+    gap: 8px;
+    padding: 4px 0;
+    grid-template-columns: 36px 1fr 40px 20px;
 }
 
-table td {
-    padding: 2px 4px;
-}
-
-table tr td:first-child {
-    padding-left: 0;
-}
-
-table tr th:first-child {
-    padding-left: 0;
-}
-
-table tr td:last-child {
-    padding-right: 0;
-}
-
-table tr th:last-child {
-    padding-right: 0;
-}
-
-table th {
-    padding: 2px 4px;
-}
-
-table {
-    display: block;
-    width: 365px;
-    border-collapse: separate;
+.my-ranks-line {
+    display: grid;
+    gap: 8px;
+    padding: 4px 0;
+    grid-template-columns: 36px 1fr 40px 20px;
 }
 
 .user-link {

@@ -16,7 +16,7 @@ export interface LeaderboardItem {
 export interface Rank {
   id: number,
   score: number,
-  difficulty: number,
+  difficulty: 1 | 2 | 3,
   place: number,
 }
 
