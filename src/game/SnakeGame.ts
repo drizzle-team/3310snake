@@ -1,5 +1,20 @@
 import { mapSnake, gameSegments } from "./mapSnake";
-import { preventControlButtons } from "./";
+import { preventControlButtons} from "../components/BusinessLogic";
+
+export type Replay = {
+  events: Array <{
+    index: number;
+    type: 'direction';
+    direction: 'UP' | 'LEFT' | 'RIGHT' | 'DOWN';
+  } | {
+    index: number;
+    type: 'food' | keyof typeof gameSegments.superFood;
+    x: number;
+    y: number;
+  }>
+  difficulty: keyof typeof difficulties,
+  score: number;
+} | null
 
 export const difficulties = {
   1: { speed: 208, multiplier: 3 },
@@ -42,25 +57,20 @@ export class SnakeGame {
   eatenFoodCount: number;
   smallSquareCount: number;
   smallSquareSize: number;
-  replay: {
-    events: Array <{
-      index: number;
-      type: 'direction';
-      direction: 'UP' | 'LEFT' | 'RIGHT' | 'DOWN';
-    } | {
-      index: number;
-      type: 'food' | keyof typeof gameSegments.superFood;
-      x: number;
-      y: number;
-    }>
-    difficulty: keyof typeof difficulties,
-    score: number;
-  } | null;
+  replay: Replay;
   isReplay: boolean;
   tick: number;
   isAboutToDie: boolean;
+  setUserReplay: (replay: Replay) => void;
+  setCurrentReplayId: (valuer: number | null) => void
 
-  constructor() {
+  constructor({
+    setUserReplay,
+    setCurrentReplayId
+  } : {
+    setUserReplay: (replay: Replay) => void,
+    setCurrentReplayId: (valuer: number | null) => void,
+  }) {
     this.canvas = document.getElementById("game-canvas") as HTMLCanvasElement;
     this.ctx = this.canvas.getContext("2d")!;
     this.foodCanvas = document.getElementById("superfood-canvas") as HTMLCanvasElement;
@@ -89,6 +99,8 @@ export class SnakeGame {
     this.replay = null;
     this.tick = 0;
     this.isAboutToDie = false;
+    this.setUserReplay = setUserReplay;
+    this.setCurrentReplayId = setCurrentReplayId;
     this.resizeCanvas();
     this.redraw();
     window.addEventListener("resize", this.resizeCanvas.bind(this));
@@ -106,12 +118,21 @@ export class SnakeGame {
     this.gameLoop();
   }
 
-  playReplay(replay: typeof this.replay) {
+  playReplay(replay: Replay) {
+    this.clearCanvas()
+    this.snake = this.createInitialSnake(5);
+    this.directionQueue = ["RIGHT"];
+    this.eatenFood = [];
+    this.eatenFoodCount = 0;
+    this.superFood = null;
+    this.superFoodCount = 0;
+    this.food = { x: 16, y: 2 };
     this.isReplay = true;
     this.gameOver = false;
-    this.changeScore(0);
     this.replay = {...replay!};
-    this.replayLoop();
+    this.changeScore(0);
+    if (!this.tick) this.replayLoop();
+    this.tick = 0;
   }
 
   createInitialSnake(length: number) {
@@ -154,8 +175,11 @@ export class SnakeGame {
     const snakeSet = new Set(
       this.snake.map((segment) => `${segment.x},${segment.y}`),
     );
+    const superFoodSet = this.superFood ? new Set(
+      this.superFood.segments.map((segment) => `${segment.x},${segment.y}`),
+    ) : null;
     let freeSegments = this.gridCoordinates.filter(
-      (segment) => !snakeSet.has(`${segment.x},${segment.y}`),
+      (segment) => !snakeSet.has(`${segment.x},${segment.y}`) && !superFoodSet?.has(`${segment.x},${segment.y}`),
     );
 
     if (freeSegments.length === 1) {
@@ -533,6 +557,8 @@ export class SnakeGame {
   resetGame() {
     document.querySelector(".game-start-screen")!.classList.remove("hidden");
     document.querySelector(".countdown")!.classList.add("hidden");
+    if (this.replay && !this.isReplay) this.setUserReplay(this.replay);
+    this.setCurrentReplayId(null),
     this.snake = this.createInitialSnake(5);
     this.directionQueue = ["RIGHT"];
     this.eatenFood = [];
