@@ -151,7 +151,7 @@ button {
 }
 
 .scroll-block {
-    height: 550px;
+    height: 529px;
     overflow-x: hidden;
     overflow-y: auto;
     -ms-overflow-style: none;
