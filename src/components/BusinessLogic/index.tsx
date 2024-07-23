@@ -42,7 +42,6 @@ const BusinessLogic: React.FC<{code?: string}> = ({code}) => {
 
     if (user?.bestScore && user.bestScore < replay!.score) {
       setUser({...user, bestScore: replay!.score})
-      localStorage.removeItem('userReplay')
       showToast({
         type: 'authorized',
         score: replay!.score,
@@ -85,11 +84,7 @@ const BusinessLogic: React.FC<{code?: string}> = ({code}) => {
     await signIn(code);
     const user = await getMe();
     setUser(user);
-    const savedUserReplay = localStorage.getItem('userReplay') ? JSON.parse(localStorage.getItem('userReplay')!) : null
-    if (savedUserReplay) {
-      await addUserScore(savedUserReplay)
-    }
-    localStorage.removeItem('userReplay');
+    localStorage.removeItem('userScore');
     localStorage.setItem('isLoggedIn', 'true');
   }
 
@@ -207,11 +202,10 @@ const BusinessLogic: React.FC<{code?: string}> = ({code}) => {
 
   useEffect(() => {
     if (!user && userReplay) {
-      const savedUserReplayJSON = localStorage.getItem('userReplay')
-      const savedUserReplay = savedUserReplayJSON ? JSON.parse(savedUserReplayJSON) as Replay : null;
+      const savedUserScore = localStorage.getItem('userScore') ? Number(localStorage.getItem('userScore')) : null
 
-      if ((savedUserReplay && userReplay.score > savedUserReplay.score) || !savedUserReplay) {
-        localStorage.setItem('userReplay', JSON.stringify(userReplay));
+      if ((savedUserScore && userReplay.score > savedUserScore) || !savedUserScore) {
+        localStorage.setItem('userScore', String(userReplay.score));
         showToast({
           type: 'unauthorized',
           score: userReplay.score,
@@ -239,7 +233,7 @@ const BusinessLogic: React.FC<{code?: string}> = ({code}) => {
       <div className={`toast ${isToastShown ? 'toast-visible' : ''}`}>
         <img src="/images/cup.png" alt='cup' />
         {toast?.type === 'unauthorized' && (
-          <span>New personal highscore: {toast.score}<br/><a href={import.meta.env.PUBLIC_GITGUH_AUTH_LINK}>Sign in with GitHub</a> and save it on the leaderboard</span>
+          <span>New personal highscore: {toast.score}<br/><a href={import.meta.env.PUBLIC_GITGUH_AUTH_LINK}>Sign in with GitHub</a> and save your highscores on the leaderboard</span>
         )}
         {toast?.type === 'authorized' && (
           <span>New personal highscore: {toast.score}<br/>You are on {toast.place} place in global leaderboard</span>
