@@ -111,16 +111,14 @@ button {
 .leaderboard-line {
     display: grid;
     gap: 8px;
-    padding: 4px 0;
-    grid-template-columns: 36px 40px 1fr 69px;
+    grid-template-columns: max-content max-content 1fr max-content;
     align-items: center;
 }
 
 .my-ranks-line {
     display: grid;
     gap: 8px;
-    padding: 4px 0;
-    grid-template-columns: 50px 40px 1fr 69px 20px;
+    grid-template-columns: max-content max-content 1fr max-content max-content;
     align-items: center;
 }
 
@@ -151,12 +149,16 @@ button {
 }
 
 .scroll-block {
-    height: 529px;
+    height: 545px;
     overflow-x: hidden;
     overflow-y: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
-    padding-bottom: 16px;
+    padding: 16px 0;
+}
+
+.infinite-scroll-component {
+    overflow: visible !important;
 }
 
 .scroll-block::-webkit-scrollbar {

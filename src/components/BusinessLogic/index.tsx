@@ -355,28 +355,29 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
             <a href={githubAuthLink}>Sign in with Github</a>
           )}
         </div>
-        <div style={{width: 'calc(100% + 32px)', height: '1px', background: '#555', margin: '16px -16px'}}/>
+        <div style={{width: 'calc(100% + 32px)', height: '1px', background: '#555', margin: '16px -16px 0'}}/>
         {tab === 'global' && (
           loading === 'global' ? (
             <div style={{margin: 'auto'}}>Loading...</div>
           ) : (
             <div className="scroll-block">
-              {leaderboard?.map((item, index) => (
-                <div className="leaderboard-line" key={item.id}>
-                  <div>#{item.place}</div>
-                  <div>{item.score}</div>
-                  <div>
-                    <a
-                      className="user-link"
-                      href={`https://github.com/${item.user.name}`}
-                      target="_blank"
-                    >
-                      {item.user.name}
-                    </a>
-                  </div>
-                  <div>
-                    {currentReplayId === item.id ? (
-                      <div style={{textAlign: 'right'}}>
+              <div className="leaderboard-line">
+                {leaderboard?.map((item, index) => (
+                  <>
+                    <div>#{item.place}</div>
+                    <div style={{textAlign: 'right'}}>{item.score} <span style={{fontSize: '12px'}}>PTS</span></div>
+                    <div>
+                      <a
+                        className="user-link"
+                        href={`https://github.com/${item.user.name}`}
+                        target="_blank"
+                      >
+                        {item.user.name}
+                      </a>
+                    </div>
+                    <div>
+                      {currentReplayId === item.id ? (
+                        <div style={{textAlign: 'right'}}>
                         <span className="replay-button" onClick={stopGame}>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -392,9 +393,9 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
                           </svg>
                           Stop
                         </span>
-                      </div>
-                    ) : (
-                      <div style={{textAlign: 'right'}}>
+                        </div>
+                      ) : (
+                        <div style={{textAlign: 'right'}}>
                         <span className="replay-button" onClick={() => getReplayData(item.id)}>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -410,11 +411,12 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
                           </svg>
                           Replay
                         </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ))}
+              </div>
             </div>
           )
         )}
@@ -433,14 +435,15 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
                   scrollableTarget="scrollableDiv"
                   loader={undefined}
                 >
-                  {myRanks?.ranks.map((item, index) => (
-                    <div className="my-ranks-line" key={item.id + 'myrank'}>
-                      <div>#{item.place}</div>
-                      <div>{item.score}</div>
-                      <div>{getDifficultyName(item.difficulty)}</div>
-                      <div>
-                        {currentReplayId === item.id ? (
-                          <div style={{textAlign: 'right'}}>
+                  <div className="my-ranks-line">
+                    {myRanks?.ranks.map((item, index) => (
+                      <>
+                        <div>#{item.place}</div>
+                        <div style={{textAlign: 'right'}}>{item.score} <span style={{fontSize: '12px'}}>PTS</span></div>
+                        <div>{getDifficultyName(item.difficulty)}</div>
+                        <div>
+                          {currentReplayId === item.id ? (
+                            <div style={{textAlign: 'right'}}>
                             <span className="replay-button" onClick={stopGame}>
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -456,9 +459,9 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
                               </svg>
                               Stop
                             </span>
-                          </div>
-                        ) : (
-                          <div style={{textAlign: 'right'}}>
+                            </div>
+                          ) : (
+                            <div style={{textAlign: 'right'}}>
                             <span className="replay-button" onClick={() => getReplayData(item.id)}>
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -474,36 +477,37 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
                               </svg>
                               Replay
                             </span>
+                            </div>
+                          )}
+                        </div>
+                        {isToastShown && toast?.rankSlug === item.slug ? (
+                          <div style={{height: '20px'}}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" strokeWidth="2"
+                                 className="feather feather-check">
+                              <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                          </div>
+                        ) : (
+                          <div style={{height: '20px', cursor: "pointer"}} onClick={() => shareRank(item.slug)}>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              height="20"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              className="feather feather-share">
+                              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                              <polyline points="16 6 12 2 8 6"/>
+                              <line x1="12" y1="2" x2="12" y2="15"/>
+                            </svg>
                           </div>
                         )}
-                      </div>
-                      {isToastShown && toast?.rankSlug === item.slug ? (
-                        <div style={{height: '20px'}}>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                               stroke="currentColor" strokeWidth="2"
-                               className="feather feather-check">
-                            <polyline points="20 6 9 17 4 12"/>
-                          </svg>
-                        </div>
-                      ) : (
-                        <div style={{height: '20px', cursor: "pointer"}} onClick={() => shareRank(item.slug)}>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            className="feather feather-share">
-                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                            <polyline points="16 6 12 2 8 6"/>
-                            <line x1="12" y1="2" x2="12" y2="15"/>
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                      </>
+                    ))}
+                  </div>
                 </InfiniteScroll>
               </div>
             )
