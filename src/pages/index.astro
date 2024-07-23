@@ -2,6 +2,11 @@
 import Layout from '../layouts/Layout.astro';
 import { Image } from "astro:assets";
 import NokiaImage from '../assets/Nokia.png';
+import NokiaLowImage from '../assets/NokiaLow.png';
+import BusinessLogic from "../components/BusinessLogic";
+
+const code = Astro.url.searchParams.get('code') || '';
+const replay = Astro.url.searchParams.get('replay') || '';
 ---
 
 <Layout>
@@ -10,6 +15,7 @@ import NokiaImage from '../assets/Nokia.png';
 		<div class="container">
 			<div class="mobile-phone">
 				<Image src={NokiaImage} alt="nokia" />
+				<Image class="lq" src={NokiaLowImage} alt="nokia-lq" />
 				<div class="screen">
 					<div class="info-line">
 						<div id="score">
@@ -28,17 +34,19 @@ import NokiaImage from '../assets/Nokia.png';
 							<div class="game-start-screen">
 									<div id="change-difficulty"><span id="game-difficulty">Normal</span></div>
 									<div id="start-game">Play</div>
-									<div id="replay-game">Replay</div>
+									<div id="leaderboard-button">Leaderboard</div>
+							</div>
+							<div class="game-loading-screen hidden">
+								<div>Loading...</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
+			<BusinessLogic client:only="react" code={code} replaySlug={replay} />
 		</div>
 	</main>
 </Layout>
-
-<script src="../game/index.ts"></script>
 
 <style is:global>
 	html {
@@ -55,7 +63,7 @@ import NokiaImage from '../assets/Nokia.png';
 		bottom: 0;
 		width: 100vw;
 		height: 100vh;
-		z-index: 1;
+		z-index: -1;
 		background: url("../assets/background.jpeg");
 		background-repeat: no-repeat;
 		background-position: top;
@@ -75,6 +83,7 @@ import NokiaImage from '../assets/Nokia.png';
 	 }
 
 	.container {
+		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -82,26 +91,32 @@ import NokiaImage from '../assets/Nokia.png';
 		height: 100vh;
 		overflow: hidden;
 	}
+
 	.mobile-phone {
+		height: 1823px;
+		width: 500px;
 		position: relative;
 	}
+
 	.mobile-phone img {
 		position: fixed;
-		width: 500px;
+		z-index: 3;
 		top: -300px;
-		left: calc(50% - 2px);
-		transform: translateX(-50%);
-		z-index: 2;
+		height: 1823px;
+		width: 500px;
 		object-fit: contain;
 		pointer-events: none;
+	}
+
+	.mobile-phone .lq {
+		z-index: 2;
 	}
 
 	.screen {
 		position: fixed;
 		z-index: 1;
 		top: 339px;
-		left: 50%;
-		transform: translateX(-50%);
+		margin-left: 79px;
 		width: 345px;
 		height: 247px;
 		background: #73a582;
@@ -132,6 +147,21 @@ import NokiaImage from '../assets/Nokia.png';
 	}
 
 	.game-start-screen {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		align-items: center;
+		justify-content: center;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		font-size: 24px;
+		background: #73a582;
+	}
+
+	.game-loading-screen {
 		position: absolute;
 		top: 0;
 		bottom: 0;

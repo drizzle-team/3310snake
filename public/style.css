@@ -1,0 +1,155 @@
+.leaderboard-container {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 16px 0;
+    border-radius: 8px;
+    width: 500px;
+    height: 600px;
+    margin-left: -500px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s;
+    background-color: #f1f2f345;
+    border: 1.7px solid rgba(229, 232, 234, 0.12);
+    -webkit-backdrop-filter: blur(50px);
+    backdrop-filter: blur(50px);
+    position: relative;
+    flex-shrink: 0;
+}
+
+.leaderboard-container::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 0 0 8px 8px;
+    height: 16px;
+    background: linear-gradient(to top, #858b93, 70%, transparent)
+}
+
+.visible {
+    margin-left: 54px;
+    opacity: 1;
+    width: 400px;
+    pointer-events: all;
+}
+
+.leaderboard-title {
+    font-size: 20px;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    top: 24px;
+    right: -324px;
+    transition: all 0.3s;
+    background-color: #f1f2f345;
+    border: 1.7px solid rgba(229, 232, 234, 0.12);
+    -webkit-backdrop-filter: blur(50px);
+    backdrop-filter: blur(50px);
+    padding: 16px 16px 16px 12px;
+    width: 300px;
+    border-radius: 8px;
+    z-index: 99999;
+    pointer-events: none;
+    line-height: 24px;
+    opacity: 0;
+    white-space: pre-wrap;
+}
+
+.toast img {
+    align-self: flex-start;
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    margin-right: 8px;
+}
+
+.toast svg {
+    align-self: flex-start;
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    margin-right: 8px;
+}
+
+.toast-visible {
+    right: 24px;
+    opacity: 1;
+    pointer-events: all;
+}
+
+a {
+    color: #000;
+    text-decoration: underline;
+}
+
+button {
+    color: #000;
+    text-decoration: underline;
+}
+
+.tab {
+    font-size: 14px;
+    user-select: none;
+    color: #222;
+    cursor: pointer;
+}
+
+.tab:hover {
+    color: #000;
+}
+
+.tab-active {
+    color: #000;
+    text-decoration: underline;
+}
+
+.leaderboard-line {
+    display: grid;
+    gap: 8px;
+    padding: 4px 0;
+    grid-template-columns: 36px 40px 1fr 50px;
+    align-items: center;
+}
+
+.my-ranks-line {
+    display: grid;
+    gap: 8px;
+    padding: 4px 0;
+    grid-template-columns: 50px 40px 1fr 50px 20px;
+    align-items: center;
+}
+
+.user-link {
+    text-decoration: none;
+    word-break: break-word;
+}
+
+.user-link:hover {
+    text-decoration: underline;
+}
+
+.replay-button {
+    cursor: pointer;
+}
+
+.replay-button:hover {
+    text-decoration: underline;
+}
+
+.scroll-block {
+    height: 550px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    padding-bottom: 16px;
+}
+
+.scroll-block::-webkit-scrollbar {
+    display: none;
+}
