@@ -5,6 +5,7 @@ import {getMe, signIn, signOut} from "../../api/auth";
 import type {User} from "../../api/auth.ts";
 import {addScore, getLeaderboard, getMyRanks, getReplayById} from "../../api/leaderboard.ts";
 import type {Rank, LeaderboardItem} from "../../api/leaderboard.ts";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export const preventControlButtons = (e: KeyboardEvent) => {
   if (
@@ -50,7 +51,7 @@ const BusinessLogic: React.FC<{code?: string}> = ({code}) => {
       })
     }
     getLeaderboardData();
-    getMyRanksData();
+    getMyRanksData({limit: myRanks?.ranks.length ? myRanks?.ranks.length + 1 : 30});
   }
 
   const getLeaderboardData = async () => {
@@ -68,10 +69,15 @@ const BusinessLogic: React.FC<{code?: string}> = ({code}) => {
     playReplay(data);
   }
 
-  const getMyRanksData = async () => {
+  const getMyRanksData = async ({next, limit} : {next?: string, limit?: number}) => {
     if (myRanks === null) setLoading('personal');
-    const data = await getMyRanks();
-    setMyRanks(data)
+    const data = await getMyRanks({next, limit});
+    if (next) {
+      setMyRanks((prev) => ({ranks: [...prev!.ranks, ...data.ranks], next: data.next}))
+    } else {
+      setMyRanks(data)
+    }
+
     setLoading(null);
   }
 
@@ -223,7 +229,7 @@ const BusinessLogic: React.FC<{code?: string}> = ({code}) => {
     }
     if (!localStorage.getItem('isLoggedIn')) return;
     if (tab === 'personal' && !myRanks) {
-      getMyRanksData();
+      getMyRanksData({});
     }
   },[tab, leaderboard, myRanks])
 
@@ -327,33 +333,41 @@ const BusinessLogic: React.FC<{code?: string}> = ({code}) => {
                   <div>Score</div>
                   <div></div>
                 </div>
-                <div className="scroll-block">
-                  {myRanks?.ranks.map((item, index) => (
-                    <div className="my-ranks-line" key={item.id + 'myrank'}>
-                      <div>{item.place}</div>
-                      <div>{getDifficultyName(item.difficulty)}</div>
-                      <div>{item.score}</div>
-                      <div>
-                        {currentReplayId === item.id ? (
-                          <div style={{cursor: 'pointer', width: '100%', textAlign: 'right'}} onClick={stopGame}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                 fill="#000" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                                 strokeLinejoin="round" className="feather feather-square">
-                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            </svg>
-                          </div>
-                        ) : (
-                          <div style={{cursor: 'pointer', width: '100%', textAlign: 'right'}} onClick={() => getReplayData(item.id)}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#000"
-                                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                                 className="feather feather-play">
-                              <polygon points="5 3 19 12 5 21 5 3"/>
-                            </svg>
-                          </div>
-                        )}
+                <div className="scroll-block" id="scrollableDiv">
+                  <InfiniteScroll
+                    dataLength={myRanks?.ranks.length || 0}
+                    next={() => getMyRanksData({next: myRanks?.next || undefined})}
+                    hasMore={!!myRanks?.next}
+                    scrollableTarget="scrollableDiv"
+                    loader={undefined}
+                  >
+                    {myRanks?.ranks.map((item, index) => (
+                      <div className="my-ranks-line" key={item.id + 'myrank'}>
+                        <div>{item.place}</div>
+                        <div>{getDifficultyName(item.difficulty)}</div>
+                        <div>{item.score}</div>
+                        <div>
+                          {currentReplayId === item.id ? (
+                            <div style={{cursor: 'pointer', width: '100%', textAlign: 'right'}} onClick={stopGame}>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                   fill="#000" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                                   strokeLinejoin="round" className="feather feather-square">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                              </svg>
+                            </div>
+                          ) : (
+                            <div style={{cursor: 'pointer', width: '100%', textAlign: 'right'}} onClick={() => getReplayData(item.id)}>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#000"
+                                   stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                                   className="feather feather-play">
+                                <polygon points="5 3 19 12 5 21 5 3"/>
+                              </svg>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </InfiniteScroll>
                 </div>
               </>
             )

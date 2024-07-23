@@ -28,8 +28,8 @@ export const getLeaderboard = async () => {
   return instance.get<LeaderboardItem[]>('/game/leaderboard');
 };
 
-export const getMyRanks = async (next?: string) => {
-  return instance.get<{ranks: Rank[], next: string | null}>('/game/my-ranks', {params: {cursor: next, limit: 50}});
+export const getMyRanks = async ({next, limit} : {next?: string, limit?: number}) => {
+  return instance.get<{ranks: Rank[], next: string | null}>('/game/my-ranks', {params: {cursor: next, limit: limit || 30}});
 };
 
 export const getReplayById = async (id: number) => {
