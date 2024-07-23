@@ -6,6 +6,7 @@ import type {User} from "../../api/auth.ts";
 import {addScore, getLeaderboard, getMyRanks, getReplayById, getSharedReplay} from "../../api/leaderboard.ts";
 import type {Rank, LeaderboardItem, SharedReplay} from "../../api/leaderboard.ts";
 import InfiniteScroll from "react-infinite-scroll-component";
+import {githubAuthLink} from "../../const";
 
 export const preventControlButtons = (e: KeyboardEvent) => {
   if (
@@ -280,7 +281,7 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
           </svg>
         )}
         {toast?.type === 'unauthorized' && (
-          <span>New personal highscore: {toast.score}<br/><a href={import.meta.env.PUBLIC_GITGUH_AUTH_LINK}>Sign in with GitHub</a> and save your highscores on the leaderboard</span>
+          <span>New personal highscore: {toast.score}<br/><a href={githubAuthLink}>Sign in with GitHub</a> and save your highscores on the leaderboard</span>
         )}
         {toast?.type === 'authorized' && (
           <span>New personal highscore: {toast.score}<br/>You are on {toast.place} place in global ranking</span>
@@ -309,7 +310,7 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
               </div>
             </div>
           ) : (
-            <a href={import.meta.env.PUBLIC_GITGUH_AUTH_LINK}>Sign in with Github</a>
+            <a href={githubAuthLink}>Sign in with Github</a>
           )}
 
         </div>

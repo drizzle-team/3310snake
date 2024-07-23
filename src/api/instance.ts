@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import {refreshAccessToken, signOut} from './auth';
+import {apiURL} from "../const";
 
 interface CustomResponse extends AxiosResponse<{
   code: number;
@@ -17,7 +18,7 @@ export const serializeParams = (params: Record<string, any>) => (
 
 
 const instance = axios.create({
-  baseURL: import.meta.env.PUBLIC_API_URL,
+  baseURL: apiURL,
   paramsSerializer: serializeParams,
   headers: {
     'Content-Type': 'application/json',
