@@ -92,7 +92,7 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
   }
 
   const shareRank = async (slug: string) => {
-    await navigator.clipboard.writeText(`https://dd98-91-247-76-50.ngrok-free.app/?replay=${slug}`);
+    await navigator.clipboard.writeText(`https://3310snake.com/?replay=${slug}`);
     showToast({type: 'copied', timeout: 2000, rankSlug: slug})
   }
 
