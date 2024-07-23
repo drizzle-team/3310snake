@@ -25,9 +25,10 @@ export const preventControlButtons = (e: KeyboardEvent) => {
   }
 };
 
+const isLeaderboardOpen = !!localStorage.getItem('isLeaderboardOpen')
 
 const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, replaySlug}) => {
-  const [open, setIsOpen] = useState(!!replaySlug);
+  const [open, setIsOpen] = useState(!!replaySlug || isLeaderboardOpen);
   const [userReplay, setUserReplay] = useState<Replay>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isToastShown, setIsToastShown] = useState<boolean>(false);
@@ -256,7 +257,15 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
     if (localStorage.getItem('isLoggedIn') === 'true') getUser();
 
     document.getElementById('leaderboard-button')?.addEventListener('click', () => {
-      setIsOpen((prev) => !prev);
+      setIsOpen((prev) => {
+        if (!prev) {
+          localStorage.setItem('isLeaderboardOpen', 'true')
+        } else {
+          localStorage.removeItem('isLeaderboardOpen')
+        }
+        return !prev
+      });
+
       setTab((prev) => prev === 'shared' ? 'global' : prev)
     });
 
@@ -324,7 +333,7 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
         )}
       </div>
       <div className={`leaderboard-container ${open ? 'visible' : ''}`}>
-        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', gap: '12px'}}>
+        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px'}}>
           <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px'}}>
             <div className={`tab ${tab === 'global' ? 'tab-active' : ''}`} onClick={() => setTab('global')}>Global ranking</div>
             <div className={`tab ${tab === 'personal' ? 'tab-active' : ''}`} onClick={() => setTab('personal')}>My ranks</div>
@@ -345,8 +354,8 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
           ) : (
             <a href={githubAuthLink}>Sign in with Github</a>
           )}
-
         </div>
+        <div style={{width: 'calc(100% + 32px)', height: '1px', background: '#555', margin: '16px -16px'}}/>
         {tab === 'global' && (
           loading === 'global' ? (
             <div style={{margin: 'auto'}}>Loading...</div>
