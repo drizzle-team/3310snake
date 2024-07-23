@@ -53,3 +53,7 @@ export const getReplayById = async (id: number) => {
 export const getSharedReplay = async (slug: string) => {
   return instance.get<SharedReplay>(`/game/shared/${slug}`);
 };
+
+export const assignRanks = async (slugs: string[]) => {
+  return instance.put('/game/assign', {slugs});
+};
