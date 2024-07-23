@@ -4,7 +4,7 @@ import type {Replay} from '../game/SnakeGame.ts';
 export interface LeaderboardItem {
   id: number,
   score: number,
-  difficulty: number,
+  difficulty: 1 | 2 | 3,
   place: number,
   user: {
     id: number,
@@ -18,6 +18,20 @@ export interface Rank {
   score: number,
   difficulty: 1 | 2 | 3,
   place: number,
+  slug: string,
+}
+
+export interface SharedReplay {
+  id: number,
+  score: number,
+  difficulty: 1 | 2 | 3,
+  place: number,
+  user: {
+    id: number,
+    name: string,
+    profilePhoto: string | null,
+  },
+  replay: Replay,
 }
 
 export const addScore = async (replay: Replay) => {
@@ -29,9 +43,13 @@ export const getLeaderboard = async () => {
 };
 
 export const getMyRanks = async ({next, limit} : {next?: string, limit?: number}) => {
-  return instance.get<{ranks: Rank[], next: string | null}>('/game/my-ranks', {params: {cursor: next, limit: limit || 30}});
+  return instance.get<{ranks: Rank[], next: string | null}>('/game/my-ranks', {params: {cursor: next, limit: limit || 50}});
 };
 
 export const getReplayById = async (id: number) => {
   return instance.get<Replay>(`/game/replay/${id}`);
+};
+
+export const getSharedReplay = async (slug: string) => {
+  return instance.get<SharedReplay>(`/game/shared/${slug}`);
 };

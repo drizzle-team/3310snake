@@ -1,7 +1,7 @@
 .leaderboard-container {
     display: flex;
     flex-direction: column;
-    padding: 16px;
+    padding: 16px 16px 0;
     border-radius: 8px;
     width: 500px;
     height: 600px;
@@ -11,7 +11,21 @@
     transition: all 0.3s;
     background-color: #f1f2f345;
     border: 1.7px solid rgba(229, 232, 234, 0.12);
+    -webkit-backdrop-filter: blur(50px);
     backdrop-filter: blur(50px);
+    position: relative;
+    flex-shrink: 0;
+}
+
+.leaderboard-container::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 0 0 8px 8px;
+    height: 16px;
+    background: linear-gradient(to top, #858b93, 70%, transparent)
 }
 
 .visible {
@@ -34,6 +48,7 @@
     transition: all 0.3s;
     background-color: #f1f2f345;
     border: 1.7px solid rgba(229, 232, 234, 0.12);
+    -webkit-backdrop-filter: blur(50px);
     backdrop-filter: blur(50px);
     padding: 16px 16px 16px 12px;
     width: 300px;
@@ -46,6 +61,14 @@
 }
 
 .toast img {
+    align-self: flex-start;
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    margin-right: 8px;
+}
+
+.toast svg {
     align-self: flex-start;
     width: 24px;
     height: 24px;
@@ -89,30 +112,42 @@ button {
     display: grid;
     gap: 8px;
     padding: 4px 0;
-    grid-template-columns: 36px 1fr 40px 20px;
+    grid-template-columns: 36px 40px 1fr 50px;
+    align-items: center;
 }
 
 .my-ranks-line {
     display: grid;
     gap: 8px;
     padding: 4px 0;
-    grid-template-columns: 36px 1fr 40px 20px;
+    grid-template-columns: 50px 40px 1fr 50px 20px;
+    align-items: center;
 }
 
 .user-link {
     text-decoration: none;
+    word-break: break-word;
 }
 
 .user-link:hover {
     text-decoration: underline;
 }
 
+.replay-button {
+    cursor: pointer;
+}
+
+.replay-button:hover {
+    text-decoration: underline;
+}
+
 .scroll-block {
-    height: 480px;
+    height: 550px;
     overflow-x: hidden;
     overflow-y: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
+    padding-bottom: 16px;
 }
 
 .scroll-block::-webkit-scrollbar {
