@@ -112,7 +112,7 @@ button {
     display: grid;
     gap: 8px;
     padding: 4px 0;
-    grid-template-columns: 36px 40px 1fr 50px;
+    grid-template-columns: 36px 40px 1fr 69px;
     align-items: center;
 }
 
@@ -120,7 +120,7 @@ button {
     display: grid;
     gap: 8px;
     padding: 4px 0;
-    grid-template-columns: 50px 40px 1fr 50px 20px;
+    grid-template-columns: 50px 40px 1fr 69px 20px;
     align-items: center;
 }
 
@@ -134,7 +134,16 @@ button {
 }
 
 .replay-button {
+    display: flex;
+    align-items: center;
     cursor: pointer;
+    gap: 4px;
+    justify-content: flex-end;
+}
+
+.replay-button svg {
+    width: 16px;
+    height: 16px;
 }
 
 .replay-button:hover {

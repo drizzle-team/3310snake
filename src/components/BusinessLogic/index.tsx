@@ -3,7 +3,14 @@ import type {Replay} from "../../game/SnakeGame.ts";
 import {SnakeGame} from "../../game/SnakeGame";
 import {getMe, signIn, signOut} from "../../api/auth";
 import type {User} from "../../api/auth.ts";
-import {addScore, getLeaderboard, getMyRanks, getReplayById, getSharedReplay} from "../../api/leaderboard.ts";
+import {
+  addScore,
+  assignRanks,
+  getLeaderboard,
+  getMyRanks,
+  getReplayById,
+  getSharedReplay
+} from "../../api/leaderboard.ts";
 import type {Rank, LeaderboardItem, SharedReplay} from "../../api/leaderboard.ts";
 import InfiniteScroll from "react-infinite-scroll-component";
 import {githubAuthLink} from "../../const";
@@ -44,17 +51,52 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
     const data = await addScore(replay);
     setUserReplay(null);
 
-    if (user?.bestScore && user.bestScore < replay!.score) {
-      setUser({...user, bestScore: replay!.score})
-      showToast({
-        type: 'authorized',
-        score: replay!.score,
-        place: data.place,
-        timeout: 5000,
-      })
+    if (user) {
+      if (!user.bestScore || user.bestScore < replay!.score) {
+        setUser({...user, bestScore: replay!.score})
+        showToast({
+          type: 'authorized',
+          score: replay!.score,
+          place: data.place,
+          timeout: 5000,
+        })
+      }
+      getLeaderboardData();
+      getMyRanksData({limit: myRanks?.ranks.length ? myRanks?.ranks.length + 1 : 30});
+    } else {
+      const userRanksJSON = localStorage.getItem('userRanks');
+      const userRanks = userRanksJSON ? JSON.parse(userRanksJSON) as {maxScore: number, slugs: string[]} : null
+      if (userRanks) {
+        if (userRanks.maxScore < replay!.score) {
+          showToast({
+            type: 'unauthorized',
+            score: replay!.score,
+            place: data.place,
+            timeout: 10000,
+          })
+          localStorage.setItem('userRanks', JSON.stringify({
+            maxScore: replay!.score,
+            slugs: [...userRanks.slugs, data.slug]
+          }))
+        } else {
+          localStorage.setItem('userRanks', JSON.stringify({
+            ...userRanks,
+            slugs: [...userRanks.slugs, data.slug]
+          }))
+        }
+      } else {
+        showToast({
+          type: 'unauthorized',
+          score: replay!.score,
+          place: data.place,
+          timeout: 10000,
+        })
+        localStorage.setItem('userRanks', JSON.stringify({
+          maxScore: replay!.score,
+          slugs: [data.slug]
+        }))
+      }
     }
-    getLeaderboardData();
-    getMyRanksData({limit: myRanks?.ranks.length ? myRanks?.ranks.length + 1 : 30});
   }
 
   const getLeaderboardData = async () => {
@@ -111,9 +153,13 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
 
   const signInUser = async (code: string) => {
     await signIn(code);
+    const userRanksJSON = localStorage.getItem('userRanks');
+    const userRanks = userRanksJSON ? JSON.parse(userRanksJSON) as {maxScore: number, slugs: string[]} : null;
+    if (userRanks?.slugs) await assignRanks(userRanks.slugs);
     const user = await getMe();
     setUser(user);
-    localStorage.removeItem('userScore');
+    getLeaderboardData();
+    localStorage.removeItem('userRanks');
     localStorage.setItem('isLoggedIn', 'true');
   }
 
@@ -241,21 +287,8 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
   }, [replaySlug]);
 
   useEffect(() => {
-    if (!user && userReplay) {
-      const savedUserScore = localStorage.getItem('userScore') ? Number(localStorage.getItem('userScore')) : null
-
-      if ((savedUserScore && userReplay.score > savedUserScore) || !savedUserScore) {
-        localStorage.setItem('userScore', String(userReplay.score));
-        showToast({
-          type: 'unauthorized',
-          score: userReplay.score,
-          timeout: 10000,
-        })
-      }
-    } else if (user && userReplay) {
-      addUserScore(userReplay);
-    }
-  },[user, userReplay])
+     if (userReplay) addUserScore(userReplay);
+  },[userReplay])
 
   useEffect(() => {
     if (tab === 'global' && !leaderboard) {
@@ -335,11 +368,39 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
                   <div>
                     {currentReplayId === item.id ? (
                       <div style={{textAlign: 'right'}}>
-                        <span className="replay-button" onClick={stopGame}>Stop</span>
+                        <span className="replay-button" onClick={stopGame}>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            className="feather feather-square"
+                          >
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                          </svg>
+                          Stop
+                        </span>
                       </div>
                     ) : (
                       <div style={{textAlign: 'right'}}>
-                        <span className="replay-button" onClick={() => getReplayData(item.id)}>Replay</span>
+                        <span className="replay-button" onClick={() => getReplayData(item.id)}>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            className="feather feather-play"
+                          >
+                            <polygon points="5 3 19 12 5 21 5 3"/>
+                          </svg>
+                          Replay
+                        </span>
                       </div>
                     )}
                   </div>
@@ -371,11 +432,39 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
                       <div>
                         {currentReplayId === item.id ? (
                           <div style={{textAlign: 'right'}}>
-                            <span className="replay-button" onClick={stopGame}>Stop</span>
+                            <span className="replay-button" onClick={stopGame}>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                className="feather feather-square"
+                              >
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                              </svg>
+                              Stop
+                            </span>
                           </div>
                         ) : (
                           <div style={{textAlign: 'right'}}>
-                            <span className="replay-button" onClick={() => getReplayData(item.id)}>Replay</span>
+                            <span className="replay-button" onClick={() => getReplayData(item.id)}>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                className="feather feather-play"
+                              >
+                                <polygon points="5 3 19 12 5 21 5 3"/>
+                              </svg>
+                              Replay
+                            </span>
                           </div>
                         )}
                       </div>
@@ -433,11 +522,39 @@ const BusinessLogic: React.FC<{code?: string, replaySlug?: string}> = ({code, re
                 <div>
                   {currentReplayId === sharedReplay?.id ? (
                     <div style={{textAlign: 'right'}}>
-                      <span className="replay-button" onClick={stopGame}>Stop</span>
+                      <span className="replay-button" onClick={stopGame}>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="feather feather-square"
+                        >
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        </svg>
+                        Stop
+                      </span>
                     </div>
                   ) : (
                     <div style={{textAlign: 'right'}}>
-                      <span className="replay-button" onClick={playSharedReplay}>Replay</span>
+                      <span className="replay-button" onClick={playSharedReplay}>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="feather feather-play"
+                        >
+                          <polygon points="5 3 19 12 5 21 5 3"/>
+                        </svg>
+                        Replay
+                      </span>
                     </div>
                   )}
                 </div>
