@@ -157,6 +157,7 @@ button {
     font-size: 14px;
     text-decoration: none;
     word-break: break-word;
+    cursor: pointer;
 }
 
 .user-link:hover {
