@@ -1,20 +1,58 @@
+.leaderboard-wrap {
+    display: flex;
+    flex-direction: column;
+    margin-left: -500px;
+    gap: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s;
+    flex-shrink: 0;
+}
+
 .leaderboard-container {
     display: flex;
     flex-direction: column;
     padding: 16px 16px 0;
     border-radius: 8px;
-    width: 500px;
+    width: 400px;
     height: 600px;
-    margin-left: -500px;
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.3s;
     background-color: #f1f2f345;
     border: 1.7px solid rgba(229, 232, 234, 0.12);
     -webkit-backdrop-filter: blur(50px);
     backdrop-filter: blur(50px);
     position: relative;
     flex-shrink: 0;
+}
+
+.create-room-button {
+    background-color: #f1f2f345;
+    border: 1.7px solid rgba(229, 232, 234, 0.12);
+    -webkit-backdrop-filter: blur(50px);
+    backdrop-filter: blur(50px);
+    cursor: pointer;
+    width: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.room-container {
+    background-color: #f1f2f345;
+    border: 1.7px solid rgba(229, 232, 234, 0.12);
+    -webkit-backdrop-filter: blur(50px);
+    backdrop-filter: blur(50px);
+    width: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-radius: 8px;
+}
+
+.create-room-button:hover {
+    border-color: #555;
 }
 
 .leaderboard-container::before {
@@ -108,14 +146,7 @@ button {
     text-decoration: underline;
 }
 
-.leaderboard-line {
-    display: grid;
-    gap: 8px;
-    grid-template-columns: max-content max-content 1fr max-content;
-    align-items: center;
-}
-
-.my-ranks-line {
+.leaderboard-grid {
     display: grid;
     gap: 8px;
     grid-template-columns: max-content max-content 1fr max-content max-content;
@@ -123,6 +154,7 @@ button {
 }
 
 .user-link {
+    font-size: 14px;
     text-decoration: none;
     word-break: break-word;
 }
@@ -163,4 +195,74 @@ button {
 
 .scroll-block::-webkit-scrollbar {
     display: none;
+}
+
+.dialog {
+    border: 0;
+    outline: 0;
+    margin: auto;
+    cursor: pointer;
+    background: unset;
+}
+
+.dialog::backdrop {
+    backdrop-filter: blur(2px);
+    background: rgba(34, 40, 49, 0.4);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.dialog-content {
+    background-color: #f1f2f345;
+    border: 1.7px solid rgba(229, 232, 234, 0.12);
+    -webkit-backdrop-filter: blur(50px);
+    backdrop-filter: blur(50px);
+    padding: 16px;
+    width: 300px;
+    border-radius: 8px;
+}
+
+.input {
+    padding: 0 8px;
+    font-size: 14px;
+    height: 32px;
+    width: 100%;
+    border: 1px solid #555;
+    outline: none;
+    border-radius: 4px;
+    background: none;
+}
+
+
+.input:hover {
+     border-color: #000;
+}
+
+.input::placeholder {
+    color: #555;
+}
+
+.input:focus {
+     border-color: #000;
+ }
+
+.dialog-button:hover {
+    text-decoration: underline;
+}
+
+.back-button {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.back-button:hover {
+    text-decoration: underline;
+}
+
+.back-button svg {
+    width: 18px;
+    height: 18px;
 }
