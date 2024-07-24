@@ -13,7 +13,7 @@ import {
 } from "../../api/leaderboard.ts";
 import type {Rank, LeaderboardItem, SharedReplay} from "../../api/leaderboard.ts";
 import InfiniteScroll from "react-infinite-scroll-component";
-import {githubAuthLink} from "../../const";
+import {getGithubAuthLink} from "../../const";
 import CreateRoomModal from "../CreateRoomModal";
 
 interface Props {
@@ -375,7 +375,7 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
           </svg>
         )}
         {toast?.type === 'unauthorized' && (
-          <span>New personal highscore: {toast.score}<br/><a href={githubAuthLink}>Sign in with GitHub</a> and save your highscores on the leaderboard</span>
+          <span>New personal highscore: {toast.score}<br/><a href={getGithubAuthLink(roomName || '')}>Sign in with GitHub</a> and save your highscores on the leaderboard</span>
         )}
         {toast?.type === 'authorized' && (
           <span>New personal highscore: {toast.score}<br/>You are on {toast.place} place in {roomId ? 'room' : 'global'} ranking</span>
@@ -506,7 +506,7 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
                   </div>
                 </div>
               ) : (
-                <a href={githubAuthLink}>Sign in with Github</a>
+                <a href={getGithubAuthLink(roomName || '')}>Sign in with Github</a>
               )
             )}
           </div>
