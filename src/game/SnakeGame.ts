@@ -277,7 +277,7 @@ export class SnakeGame {
               ],
               type: event.type,
             }
-            this.superFoodCount = 20;
+            this.superFoodCount = 19;
             this.eatenFoodCount = 0
           }
         })

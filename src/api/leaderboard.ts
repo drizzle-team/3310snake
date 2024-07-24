@@ -6,6 +6,7 @@ export interface LeaderboardItem {
   score: number,
   difficulty: 1 | 2 | 3,
   place: number,
+  slug: string,
   user: {
     id: number,
     name: string,
@@ -34,16 +35,16 @@ export interface SharedReplay {
   replay: Replay,
 }
 
-export const addScore = async (replay: Replay) => {
-  return instance.post<Rank>('/game/score', {...replay});
+export const addScore = async (data: {replay: Replay, roomId?: number}) => {
+  return instance.post<Rank>('/game/score', data);
 };
 
-export const getLeaderboard = async () => {
-  return instance.get<LeaderboardItem[]>('/game/leaderboard');
+export const getLeaderboard = async (roomId?: number) => {
+  return instance.get<LeaderboardItem[]>('/game/leaderboard', {params: {roomId}});
 };
 
-export const getMyRanks = async ({next, limit} : {next?: string, limit?: number}) => {
-  return instance.get<{ranks: Rank[], next: string | null}>('/game/my-ranks', {params: {cursor: next, limit: limit || 50}});
+export const getMyRanks = async ({next, limit, roomId} : {next?: string, limit?: number, roomId?: number}) => {
+  return instance.get<{runs: Rank[], next: string | null}>('/game/my-runs', {params: {cursor: next, limit: limit || 50, roomId}});
 };
 
 export const getReplayById = async (id: number) => {
@@ -56,4 +57,16 @@ export const getSharedReplay = async (slug: string) => {
 
 export const assignRanks = async (slugs: string[]) => {
   return instance.put('/game/assign', {slugs});
+};
+
+export const createRoom = async (name: string) => {
+  return instance.post('/room', {name});
+};
+
+export const getRoom = async (name: string) => {
+  return instance.get<{id: number}>(`/room/${name}`);
+};
+
+export const getUserRuns = async ({next, limit, userId} : {next?: string, limit?: number, userId: number}) => {
+  return instance.get<{runs: Rank[], next: string | null}>(`/game/${userId}/runs`, {params: {cursor: next, limit: limit || 50}});
 };
