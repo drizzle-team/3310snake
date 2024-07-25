@@ -51,8 +51,8 @@ export const getReplayById = async (id: number) => {
   return instance.get<Replay>(`/game/replay/${id}`);
 };
 
-export const getSharedReplay = async (slug: string) => {
-  return instance.get<SharedReplay>(`/game/shared/${slug}`);
+export const getSharedReplay = async (slug: string, roomId?: number) => {
+  return instance.get<SharedReplay>(`/game/shared/${slug}`, {params: {roomId}});
 };
 
 export const assignRanks = async (slugs: string[]) => {
@@ -67,6 +67,6 @@ export const getRoom = async (name: string) => {
   return instance.get<{id: number}>(`/room/${name}`);
 };
 
-export const getUserRuns = async ({next, limit, userId} : {next?: string, limit?: number, userId: number}) => {
-  return instance.get<{runs: Rank[], next: string | null}>(`/game/${userId}/runs`, {params: {cursor: next, limit: limit || 50}});
+export const getUserRuns = async ({next, limit, userId, roomId} : {next?: string, limit?: number, userId: number, roomId?: number}) => {
+  return instance.get<{runs: Rank[], next: string | null}>(`/game/${userId}/runs`, {params: {cursor: next, limit: limit || 50, roomId}});
 };

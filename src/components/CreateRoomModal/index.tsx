@@ -60,7 +60,7 @@ const CreateRoomModal: React.FC<Props> = ({open, onClose, isLoggedIn}) => {
       return;
     }
     if (!pattern.test(value)) {
-      setError("Invalid room name");
+      setError("Room name can only contain letters, numbers, underscores (_), and hyphens (-)");
       return;
     }
     setError("");
@@ -75,7 +75,7 @@ const CreateRoomModal: React.FC<Props> = ({open, onClose, isLoggedIn}) => {
       <div ref={contentRef} className="dialog-content">
         {isLoggedIn ? (
           <>
-            <div style={{marginBottom: '16px', fontSize: '18px'}}>Create corporation room</div>
+            <div style={{marginBottom: '16px', fontSize: '18px'}}>Create company room</div>
             <input
               value={name}
               className="input"
@@ -98,7 +98,7 @@ const CreateRoomModal: React.FC<Props> = ({open, onClose, isLoggedIn}) => {
           </>
         ) : (
           <>
-            <div>Sign in to create your corporation room</div>
+            <div>Sign in to create your company room</div>
             <div style={{display: "flex", justifyContent: "flex-end", alignItems: "center", gap: '12px', marginTop: '12px'}}>
               <div onClick={onClose} className="dialog-button">Close</div>
             </div>

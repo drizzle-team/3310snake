@@ -6,6 +6,7 @@ import NokiaLowImage from '../assets/NokiaLow.png';
 import BusinessLogic from "../components/BusinessLogic";
 
 const code = Astro.url.searchParams.get('code') || '';
+const replay = Astro.url.searchParams.get('replay') || '';
 const { room } = Astro.params;
 ---
 
@@ -43,7 +44,7 @@ const { room } = Astro.params;
 					</div>
 				</div>
 			</div>
-			<BusinessLogic client:only="react" code={code} roomName={room} />
+			<BusinessLogic client:only="react" code={code} roomName={room} replaySlug={replay} />
 		</div>
 	</main>
 </Layout>
