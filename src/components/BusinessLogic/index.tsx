@@ -214,7 +214,7 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
     if (userRanks?.slugs) await assignRanks(userRanks.slugs);
     const user = await getMe();
     setUser(user);
-    getLeaderboardData();
+    if (!roomName) getLeaderboardData();
     localStorage.removeItem('userRanks');
     localStorage.setItem('isLoggedIn', 'true');
   }
