@@ -49,7 +49,7 @@ const CreateRoomModal: React.FC<Props> = ({open, onClose, isLoggedIn}) => {
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
-    setName(value);
+    setName(value.toLowerCase());
     const pattern = /^[a-zA-Z0-9-_]+$/;
     if (!value) {
       setError("Room name is required");
