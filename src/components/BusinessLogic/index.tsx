@@ -132,9 +132,9 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
     playReplay(data);
   }
 
-  const getUserRunsData = async ({next, limit, userId} : {next?: string, limit?: number, userId: number}) => {
+  const getUserRunsData = async ({next, limit, userId} : {next?: string, limit?: number, userId: number, roomId?: number}) => {
     if (userRuns === null) setLoading('user');
-    const data = await getUserRuns({next, limit, userId: userId});
+    const data = await getUserRuns({next, limit, userId: userId, roomId});
     if (next) {
       setUserRuns((prev) => ({runs: [...prev!.runs, ...data.runs], next: data.next}))
     } else {
@@ -147,7 +147,7 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
   const openUserRuns = (user: {name: string, id: number}) => {
     setTab("user");
     setCurrentUser(user);
-    getUserRunsData({userId: user.id})
+    getUserRunsData({userId: user.id, roomId})
   }
 
   const playSharedReplay = () => {
