@@ -15,6 +15,11 @@ import type {Rank, LeaderboardItem, SharedReplay} from "../../api/leaderboard.ts
 import InfiniteScroll from "react-infinite-scroll-component";
 import {getGithubAuthLink} from "../../const";
 import CreateRoomModal from "../CreateRoomModal";
+import {BackIcon} from "../icons/BackIcon.tsx";
+import {StopIcon} from "../icons/StopIcon.tsx";
+import {PlayIcon} from "../icons/PlayIcon.tsx";
+import {CheckIcon} from "../icons/CheckIcon.tsx";
+import {ShareIcon} from "../icons/ShareIcon.tsx";
 
 interface Props {
   code?: string,
@@ -151,10 +156,10 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
     playReplay(sharedReplay.replay);
   }
 
-  const getSharedReplayData = async (slug: string) => {
+  const getSharedReplayData = async (slug: string, roomId?: number) => {
     try {
       setLoading('shared');
-      const data = await getSharedReplay(slug);
+      const data = await getSharedReplay(slug, roomId);
       setSharedReplay(data);
       setCurrentReplayId(data.id);
       playReplay(data.replay);
@@ -166,7 +171,11 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
   }
 
   const shareRank = async (slug: string) => {
-    await navigator.clipboard.writeText(`https://3310snake.com/?replay=${slug}`);
+    if (roomName) {
+      await navigator.clipboard.writeText(`https://3310snake.com/${roomName}?replay=${slug}`);
+    } else {
+      await navigator.clipboard.writeText(`https://3310snake.com/?replay=${slug}`);
+    }
     showToast({type: 'copied', timeout: 2000, rankSlug: slug})
   }
 
@@ -264,6 +273,7 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
     snakeGame.replay = null;
     snakeGame.resetGame();
     const countdown = document.querySelector(".countdown")!;
+    window.removeEventListener("keydown", preventControlButtons, false);
     countdown.classList.add("hidden");
     setCurrentReplayId(null);
   }
@@ -339,8 +349,8 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
   }, [code])
 
   useEffect(() => {
-    if (replaySlug) getSharedReplayData(replaySlug)
-  }, [replaySlug]);
+    if (replaySlug && ((roomId && roomName) || !roomName)) getSharedReplayData(replaySlug, roomId)
+  }, [replaySlug, roomName, roomId]);
 
   useEffect(() => {
      if (userReplay) addUserScore(userReplay);
@@ -368,11 +378,7 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
         {toast?.type !== 'copied' ? (
           <img src="/images/cup.png" alt='cup' />
         ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" strokeWidth="2"
-               className="feather feather-check">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
+          <CheckIcon />
         )}
         {toast?.type === 'unauthorized' && (
           <span>New personal highscore: {toast.score}<br/><a href={getGithubAuthLink(roomName || '')}>Sign in with GitHub</a> and save your highscores on the leaderboard</span>
@@ -387,88 +393,69 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
       <div className={`leaderboard-wrap ${open ? 'visible' : ''}`}>
         {roomName ? (
           <div className='room-container'>
-            <a href='/' className='back-button'>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="feather feather-arrow-left"
-              >
-                <line x1="19" y1="12" x2="5" y2="12"/>
-                <polyline points="12 19 5 12 12 5"/>
-              </svg>
-              Global ranking
-            </a>
-            <span style={{display: "flex", alignItems: "center", gap: '8px'}}>
+            <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+              <a href='/' className='back-button'>
+                <BackIcon />
+              </a>
               {roomName}
-              {isRoomExist && (
-                isToastShown && toast?.rankSlug === roomName ? (
-                  <div style={{height: '20px'}}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" strokeWidth="2"
-                         className="feather feather-check">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                  </div>
-                ) : (
-                  <div style={{height: '20px', cursor: "pointer"}} onClick={() => shareRoom(roomName)}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className="feather feather-share">
-                      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                      <polyline points="16 6 12 2 8 6"/>
-                      <line x1="12" y1="2" x2="12" y2="15"/>
-                    </svg>
-                  </div>
-                )
-              )}
-            </span>
-
+              <div style={{width: '2px', background: '#000', height: '16px'}}/>
+              Room
+            </div>
+            {isRoomExist && (
+              isToastShown && toast?.rankSlug === roomName ? (
+                <div style={{height: '20px'}}><CheckIcon /></div>
+              ) : (
+                <div style={{height: '20px', cursor: "pointer"}} onClick={() => shareRoom(roomName)}>
+                  <ShareIcon />
+                </div>
+              )
+            )}
           </div>
         ) : (
           <div className='create-room-button' onClick={() => setIsCreateRoomModalOpen(true)}>
-            Create corporation room
+            Create company room
           </div>
         )}
 
         <div className="leaderboard-container">
           <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px'}}>
             <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px'}}>
-              {tab === 'shared' || tab === 'user' ? (
-                <div
-                  className='back-button'
-                  onClick={() => {
-                    stopGame();
-                    setCurrentUser(null);
-                    setUserRuns(null);
-                    setTab('global')
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="feather feather-arrow-left"
+              {tab !== 'global' && tab !== 'personal' ? (
+                tab === 'user' ? (
+                  <div style={{display: "flex", alignItems: 'center', gap: '8px', fontSize: '14px'}}>
+                    <div
+                      className='back-button'
+                      onClick={() => {
+                        stopGame();
+                        setCurrentUser(null);
+                        setUserRuns(null);
+                        setTab('global')
+                      }}
+                    >
+                      <BackIcon />
+                    </div>
+                    <a
+                      href={`https://github.com/${currentUser?.name}`}
+                      target="_blank"
+                      className="user-link"
+                    >
+                      {currentUser?.name}
+                    </a>
+                  </div>
+                ) : (
+                  <div
+                    className='back-button'
+                    onClick={() => {
+                      stopGame();
+                      setCurrentUser(null);
+                      setUserRuns(null);
+                      setTab('global')
+                    }}
                   >
-                    <line x1="19" y1="12" x2="5" y2="12"/>
-                    <polyline points="12 19 5 12 12 5"/>
-                  </svg>
-                  Back to ranking
-                </div>
+                    <BackIcon />
+                    Back to ranking
+                  </div>
+                )
               ) : (
                 <>
                   <div className={`tab ${tab === 'global' ? 'tab-active' : ''}`} onClick={() => setTab('global')}>
@@ -482,32 +469,21 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
                 </>
               )}
             </div>
-            {currentUser ? (
-              <a
-                href={`https://github.com/${currentUser.name}`}
-                target="_blank"
-                className="user-link"
-                style={{fontSize: '16px'}}
-              >
-                {currentUser.name}
-              </a>
-            ) : (
-              user ? (
-                <div style={{display: 'flex', alignItems: 'center', gap: '8px'}} >
-                  {user.gitHubName}
-                  <div style={{cursor: 'pointer', height: '20px'}} onClick={signOutUser}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" strokeWidth="2"
-                         className="feather feather-log-out">
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                      <polyline points="16 17 21 12 16 7"/>
-                      <line x1="21" y1="12" x2="9" y2="12"/>
-                    </svg>
-                  </div>
+            {user ? (
+              <div style={{display: 'flex', alignItems: 'center', gap: '8px'}} >
+                {user.gitHubName}
+                <div style={{cursor: 'pointer', height: '20px'}} onClick={signOutUser}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" strokeWidth="2"
+                       className="feather feather-log-out">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                  </svg>
                 </div>
-              ) : (
-                <a href={getGithubAuthLink(roomName || '')}>Sign in with Github</a>
-              )
+              </div>
+            ) : (
+              <a href={getGithubAuthLink(roomName || '')}>Sign in with Github</a>
             )}
           </div>
           <div style={{width: 'calc(100% + 32px)', height: '1px', background: '#555', margin: '16px -16px 0'}}/>
@@ -521,10 +497,10 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
                 <div className="scroll-block">
                   <div className="leaderboard-grid">
                     {leaderboard?.map((item, index) => (
-                      <React.Fragment key={'leaderboard' + item.id}>
-                        <div>#{item.place}</div>
-                        <div style={{textAlign: 'right'}}>{item.score}<span style={{fontSize: '12px'}}>pts</span></div>
-                        <div>
+                      <div key={'leaderboard' + item.id} className="leaderboard-line">
+                        <div className="cell">#{item.place}</div>
+                        <div className="cell" style={{justifyContent: 'flex-end'}}><div>{item.score}<span style={{fontSize: '12px'}}>pts</span></div></div>
+                        <div className="cell">
                           <div
                             className="user-link"
                             onClick={() => openUserRuns(item.user)}
@@ -532,71 +508,30 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
                             {item.user.name}
                           </div>
                         </div>
-                        <div>
+                        <div className={`leaderboard-button cell ${currentReplayId === item.id ? 'leaderboard-button-visible' : ''}`} style={{justifyContent: 'flex-end'}}>
                           {currentReplayId === item.id ? (
-                            <div style={{textAlign: 'right'}}>
-                        <span className="replay-button" onClick={stopGame}>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            className="feather feather-square"
-                          >
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                          </svg>
-                          Stop
-                        </span>
+                            <div>
+                              <span className="replay-button" onClick={stopGame}>
+                                <StopIcon />
+                                Stop
+                              </span>
                             </div>
                           ) : (
-                            <div style={{textAlign: 'right'}}>
-                        <span className="replay-button" onClick={() => getReplayData(item.id)}>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            className="feather feather-play"
-                          >
-                            <polygon points="5 3 19 12 5 21 5 3"/>
-                          </svg>
-                          Replay
-                        </span>
+                            <div>
+                              <span className="replay-button" onClick={() => getReplayData(item.id)}><PlayIcon />Replay</span>
                             </div>
                           )}
                         </div>
-                        {isToastShown && toast?.rankSlug === item.slug ? (
-                          <div style={{height: '20px'}}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" strokeWidth="2"
-                                 className="feather feather-check">
-                              <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                          </div>
-                        ) : (
-                          <div style={{height: '20px', cursor: "pointer"}} onClick={() => shareRank(item.slug)}>
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="20"
-                              height="20"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              className="feather feather-share">
-                              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                              <polyline points="16 6 12 2 8 6"/>
-                              <line x1="12" y1="2" x2="12" y2="15"/>
-                            </svg>
-                          </div>
-                        )}
-                      </React.Fragment>
+                        <div className={`leaderboard-button cell ${currentReplayId === item.id ? 'leaderboard-button-visible' : ''}`}>
+                          {isToastShown && toast?.rankSlug === item.slug ? (
+                            <div style={{ height: '20px'}}><CheckIcon /></div>
+                          ) : (
+                            <div style={{cursor: "pointer", height: '20px'}} onClick={() => shareRank(item.slug)}>
+                              <ShareIcon/>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -623,75 +558,36 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
                     >
                       <div className="leaderboard-grid">
                         {myRuns?.runs.map((item, index) => (
-                          <React.Fragment key={'myRuns' + item.id}>
-                            <div>#{item.place}</div>
-                            <div style={{textAlign: 'right'}}>{item.score}<span style={{fontSize: '12px'}}>pts</span></div>
-                            <div>{getDifficultyName(item.difficulty)}</div>
-                            <div>
+                          <div key={'myRuns' + item.id} className="leaderboard-line">
+                            <div className="cell">#{item.place}</div>
+                            <div className="cell" style={{justifyContent: 'flex-end'}}><div>{item.score}<span style={{fontSize: '12px'}}>pts</span></div></div>
+                            <div className="cell">
+                              {getDifficultyName(item.difficulty)}
+                            </div>
+                            <div className={`leaderboard-button cell ${currentReplayId === item.id ? 'leaderboard-button-visible' : ''}`} style={{justifyContent: 'flex-end'}}>
                               {currentReplayId === item.id ? (
-                                <div style={{textAlign: 'right'}}>
-                            <span className="replay-button" onClick={stopGame}>
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                className="feather feather-square"
-                              >
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                              </svg>
-                              Stop
-                            </span>
+                                <div>
+                              <span className="replay-button" onClick={stopGame}>
+                                <StopIcon />
+                                Stop
+                              </span>
                                 </div>
                               ) : (
-                                <div style={{textAlign: 'right'}}>
-                            <span className="replay-button" onClick={() => getReplayData(item.id)}>
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="18"
-                                height="18"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                className="feather feather-play"
-                              >
-                                <polygon points="5 3 19 12 5 21 5 3"/>
-                              </svg>
-                              Replay
-                            </span>
+                                <div>
+                                  <span className="replay-button" onClick={() => getReplayData(item.id)}><PlayIcon />Replay</span>
                                 </div>
                               )}
                             </div>
-                            {isToastShown && toast?.rankSlug === item.slug ? (
-                              <div style={{height: '20px'}}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" strokeWidth="2"
-                                     className="feather feather-check">
-                                  <polyline points="20 6 9 17 4 12"/>
-                                </svg>
-                              </div>
-                            ) : (
-                              <div style={{height: '20px', cursor: "pointer"}} onClick={() => shareRank(item.slug)}>
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="20"
-                                  height="20"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  className="feather feather-share">
-                                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                                  <polyline points="16 6 12 2 8 6"/>
-                                  <line x1="12" y1="2" x2="12" y2="15"/>
-                                </svg>
-                              </div>
-                            )}
-                          </React.Fragment>
+                            <div className={`leaderboard-button cell ${currentReplayId === item.id ? 'leaderboard-button-visible' : ''}`}>
+                              {isToastShown && toast?.rankSlug === item.slug ? (
+                                <div style={{ height: '20px'}}><CheckIcon /></div>
+                              ) : (
+                                <div style={{cursor: "pointer", height: '20px'}} onClick={() => shareRank(item.slug)}>
+                                  <ShareIcon/>
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         ))}
                       </div>
                     </InfiniteScroll>
@@ -701,60 +597,33 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
             )
           )}
           {tab === 'shared' && (
-            typeof sharedReplay === 'undefined' ? (
+            typeof sharedReplay === 'undefined' || (!!roomName && isRoomExist === false) ? (
               <div style={{margin: 'auto'}}>Broken share link :(</div>
             ) : (
-              loading === 'shared' ? (
+              loading === 'shared' || (!!roomName && typeof isRoomExist === 'undefined') ? (
                 <div style={{margin: 'auto'}}>Loading...</div>
               ) : (
                 <div style={{margin: 'auto', display: "flex", flexDirection: "column", alignItems: 'center', gap: '8px'}}>
-                  <a
-                    style={{fontSize: '20px'}}
+                  <div style={{fontSize: '20px', display: 'flex', gap: '8px', alignItems: "center"}}><span>#{sharedReplay?.place}</span><div style={{width: '2px', background: '#000', height: '20px'}}/><span>{sharedReplay?.score}<span style={{fontSize: '14px'}}>PTS</span></span></div>
+                  <div
+                    style={{fontSize: '16px'}}
                     className="user-link"
-                    href={`https://github.com/${sharedReplay?.user.name}`}
-                    target="_blank"
+                    onClick={() => openUserRuns(sharedReplay!.user)}
                   >
                     {sharedReplay?.user.name}
-                  </a>
-                  <div>Place in global ranking: {sharedReplay?.place}</div>
+                  </div>
                   <div>Difficulty: {getDifficultyName(sharedReplay?.difficulty || 1)}</div>
-                  <div>Score: {sharedReplay?.score}</div>
                   <div>
                     {currentReplayId === sharedReplay?.id ? (
                       <div style={{textAlign: 'right'}}>
                       <span className="replay-button" onClick={stopGame}>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          className="feather feather-square"
-                        >
-                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                        </svg>
+                        <StopIcon />
                         Stop
                       </span>
                       </div>
                     ) : (
                       <div style={{textAlign: 'right'}}>
-                      <span className="replay-button" onClick={playSharedReplay}>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          className="feather feather-play"
-                        >
-                          <polygon points="5 3 19 12 5 21 5 3"/>
-                        </svg>
-                        Replay
-                      </span>
+                      <span className="replay-button" onClick={playSharedReplay}><PlayIcon />Replay</span>
                       </div>
                     )}
                   </div>
@@ -776,75 +645,36 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
                 >
                   <div className="leaderboard-grid">
                     {userRuns?.runs.map((item, index) => (
-                      <React.Fragment key={'userRuns' + item.id}>
-                        <div>#{item.place}</div>
-                        <div style={{textAlign: 'right'}}>{item.score}<span style={{fontSize: '12px'}}>pts</span></div>
-                        <div>{getDifficultyName(item.difficulty)}</div>
-                        <div>
+                      <div key={'userRuns' + item.id} className="leaderboard-line">
+                        <div className="cell">#{item.place}</div>
+                        <div className="cell" style={{justifyContent: 'flex-end'}}><div>{item.score}<span style={{fontSize: '12px'}}>pts</span></div></div>
+                        <div className="cell">
+                          {getDifficultyName(item.difficulty)}
+                        </div>
+                        <div className={`leaderboard-button cell ${currentReplayId === item.id ? 'leaderboard-button-visible' : ''}`} style={{justifyContent: 'flex-end'}}>
                           {currentReplayId === item.id ? (
-                            <div style={{textAlign: 'right'}}>
-                        <span className="replay-button" onClick={stopGame}>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            className="feather feather-square"
-                          >
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                          </svg>
-                          Stop
-                        </span>
+                            <div>
+                              <span className="replay-button" onClick={stopGame}>
+                                <StopIcon />
+                                Stop
+                              </span>
                             </div>
                           ) : (
-                            <div style={{textAlign: 'right'}}>
-                        <span className="replay-button" onClick={() => getReplayData(item.id)}>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            className="feather feather-play"
-                          >
-                            <polygon points="5 3 19 12 5 21 5 3"/>
-                          </svg>
-                          Replay
-                        </span>
+                            <div>
+                              <span className="replay-button" onClick={() => getReplayData(item.id)}><PlayIcon />Replay</span>
                             </div>
                           )}
                         </div>
-                        {isToastShown && toast?.rankSlug === item.slug ? (
-                          <div style={{height: '20px'}}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" strokeWidth="2"
-                                 className="feather feather-check">
-                              <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                          </div>
-                        ) : (
-                          <div style={{height: '20px', cursor: "pointer"}} onClick={() => shareRank(item.slug)}>
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="20"
-                              height="20"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              className="feather feather-share">
-                              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                              <polyline points="16 6 12 2 8 6"/>
-                              <line x1="12" y1="2" x2="12" y2="15"/>
-                            </svg>
-                          </div>
-                        )}
-                      </React.Fragment>
+                        <div className={`leaderboard-button cell ${currentReplayId === item.id ? 'leaderboard-button-visible' : ''}`}>
+                          {isToastShown && toast?.rankSlug === item.slug ? (
+                            <div style={{ height: '20px'}}><CheckIcon /></div>
+                          ) : (
+                            <div style={{cursor: "pointer", height: '20px'}} onClick={() => shareRank(item.slug)}>
+                              <ShareIcon/>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </InfiniteScroll>

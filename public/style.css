@@ -148,9 +148,45 @@ button {
 
 .leaderboard-grid {
     display: grid;
-    gap: 8px;
     grid-template-columns: max-content max-content 1fr max-content max-content;
+    grid-auto-rows: max-content;
     align-items: center;
+}
+
+.leaderboard-line {
+    display: contents;
+}
+
+.leaderboard-line .cell {
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.leaderboard-line .cell:first-child {
+    padding: 4px 4px 4px 16px;
+}
+
+.leaderboard-line .cell:last-child {
+    padding: 4px 16px 4px 4px;
+}
+
+.leaderboard-line:hover .cell {
+    background: rgba(136, 136, 136, 50%);
+}
+
+.leaderboard-line .leaderboard-button {
+    opacity: 0;
+}
+
+.leaderboard-line .leaderboard-button-visible {
+    opacity: 1;
+}
+
+.leaderboard-line:hover .leaderboard-button {
+    opacity: 1;
+    pointer-events: all;
 }
 
 .user-link {
@@ -187,7 +223,9 @@ button {
     overflow-y: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
-    padding: 16px 0;
+    padding: 12px 0;
+    margin: 0 -16px;
+    width: calc(100% + 32px);
 }
 
 .infinite-scroll-component {
