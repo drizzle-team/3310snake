@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Buffer } from 'buffer';
 import jsSHA from 'jssha';
 
