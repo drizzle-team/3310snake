@@ -11,7 +11,6 @@ class TOTP {
   ) { }
 
   public getOtpFromKey = (): string => {
-    console.log(this.HASHED_KEY)
     const epoch = Math.round(Date.now() / 1000);
     const time = Math.floor(epoch / this.PERIOD);
     const buf = Buffer.allocUnsafe(8);
