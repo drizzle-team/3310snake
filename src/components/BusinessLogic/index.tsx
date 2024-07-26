@@ -211,12 +211,12 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
     await signIn(code);
     const userRanksJSON = localStorage.getItem('userRanks');
     const userRanks = userRanksJSON ? JSON.parse(userRanksJSON) as {maxScore: number, slugs: string[]} : null;
-    if (userRanks?.slugs) await assignRanks(userRanks.slugs);
     const user = await getMe();
     setUser(user);
+    localStorage.setItem('isLoggedIn', 'true');
+    if (userRanks?.slugs) await assignRanks(userRanks.slugs);
     if (!roomName) getLeaderboardData();
     localStorage.removeItem('userRanks');
-    localStorage.setItem('isLoggedIn', 'true');
   }
 
   const signOutUser = async () => {
@@ -397,9 +397,7 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
               <a href='/' className='back-button'>
                 <BackIcon />
               </a>
-              {roomName}
-              <div style={{width: '2px', background: '#000', height: '16px'}}/>
-              Room
+              {`${roomName} -> Room`}
             </div>
             {isRoomExist && (
               isToastShown && toast?.rankSlug === roomName ? (

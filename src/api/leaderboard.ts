@@ -1,5 +1,6 @@
 import instance from './instance';
 import type {Replay} from '../game/SnakeGame.ts';
+import {createAuthHeader} from "../utils/createAuthHeader.ts";
 
 export interface LeaderboardItem {
   id: number,
@@ -36,7 +37,12 @@ export interface SharedReplay {
 }
 
 export const addScore = async (data: {replay: Replay, roomId?: number}) => {
-  return instance.post<Rank>('/game/score', data);
+  const authHeader = createAuthHeader();
+  return instance.post<Rank>('/game/score', data, {
+    headers: {
+      'X-Analytics': authHeader,
+    }
+  });
 };
 
 export const getLeaderboard = async (roomId?: number) => {
@@ -56,7 +62,12 @@ export const getSharedReplay = async (slug: string, roomId?: number) => {
 };
 
 export const assignRanks = async (slugs: string[]) => {
-  return instance.put('/game/assign', {slugs});
+  const authHeader = createAuthHeader();
+  return instance.put('/game/assign', {slugs}, {
+    headers: {
+      'X-Analytics': authHeader,
+    }
+  });
 };
 
 export const createRoom = async (name: string) => {
