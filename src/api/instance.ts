@@ -32,8 +32,8 @@ const errorInterceptor = async (error: any) => {
       await refreshAccessToken();
       return await instance(error.config);
     } catch (e) {
-      await signOut();
       localStorage.removeItem('isLoggedIn');
+      await signOut();
     }
   } else {
     return Promise.reject(error.response?.data);
