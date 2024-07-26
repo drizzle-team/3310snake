@@ -89,7 +89,7 @@ export class SnakeGame {
     this.score = 0;
     this.gameOver = true;
     this.isReplay = false;
-    this.difficulty = 2;
+    this.difficulty = 3;
     this.smallSquareCount = 4;
     this.smallSquareSize = 4;
     this.gridCoordinates = generateGridCoordinates(
