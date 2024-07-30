@@ -14,6 +14,7 @@ const { room } = Astro.params;
 	<main>
 		<div class="background"/>
 		<div class="container">
+			<div class="made-by">made by <a href="https://drizzle.team/" target="_blank">drizzle.team</a></div>
 			<div class="mobile-phone">
 				<Image src={NokiaImage} alt="nokia" />
 				<Image class="lq" src={NokiaLowImage} alt="nokia-lq" />
@@ -90,6 +91,7 @@ const { room } = Astro.params;
 		justify-content: center;
 		width: 100vw;
 		height: 100vh;
+		max-height: 1200px;
 		overflow: hidden;
 	}
 
@@ -190,5 +192,13 @@ const { room } = Astro.params;
 	.countdown {
 		display: flex;
 		gap: 8px;
+	}
+
+	.made-by {
+		font-size: 12px;
+		position: fixed;
+		bottom: 16px;
+		right: 16px;
+		text-shadow: #fff 1px 0 0, #fff -1px 0 0, #fff 0 1px 0, #fff 0 -1px 0;
 	}
 </style>

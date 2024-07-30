@@ -397,7 +397,7 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
               <a href='/' className='back-button'>
                 <BackIcon />
               </a>
-              {`${roomName} -> Room`}
+              {`${roomName} | room`}
             </div>
             {isRoomExist && (
               isToastShown && toast?.rankSlug === roomName ? (

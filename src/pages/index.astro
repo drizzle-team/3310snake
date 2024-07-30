@@ -13,6 +13,7 @@ const replay = Astro.url.searchParams.get('replay') || '';
 	<main>
 		<div class="background"/>
 		<div class="container">
+			<div class="made-by">made by <a target="_blank" href="https://drizzle.team/">drizzle.team</a></div>
 			<div class="mobile-phone">
 				<Image src={NokiaImage} alt="nokia" />
 				<Image class="lq" src={NokiaLowImage} alt="nokia-lq" />
@@ -89,6 +90,7 @@ const replay = Astro.url.searchParams.get('replay') || '';
 		justify-content: center;
 		width: 100vw;
 		height: 100vh;
+		max-height: 1200px;
 		overflow: hidden;
 	}
 
@@ -189,5 +191,13 @@ const replay = Astro.url.searchParams.get('replay') || '';
 	.countdown {
 		display: flex;
 		gap: 8px;
+	}
+
+	.made-by {
+		font-size: 12px;
+		position: fixed;
+		bottom: 16px;
+		right: 16px;
+		text-shadow: #fff 1px 0 0, #fff -1px 0 0, #fff 0 1px 0, #fff 0 -1px 0;
 	}
 </style>

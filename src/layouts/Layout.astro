@@ -37,6 +37,11 @@ import  SpeedInsights  from "@vercel/speed-insights/astro"
 	<body>
 		<slot />
 	</body>
+	<script is:inline>
+		if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
+			document.querySelector('body').classList.add('safari');
+		}
+	</script>
 </html>
 
 <style is:global>
@@ -56,5 +61,9 @@ import  SpeedInsights  from "@vercel/speed-insights/astro"
 		font-weight: 800;
 		margin: 0;
 		padding: 0;
+	}
+
+	body.safari * {
+		font-weight: 500;
 	}
 </style>
