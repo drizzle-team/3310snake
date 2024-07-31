@@ -345,6 +345,10 @@ const BusinessLogic: React.FC<Props> = ({code, replaySlug, roomName}) => {
   },[])
 
   useEffect(() => {
+    setTimeout(() => window.scrollTo(0, window.scrollY === 0 ? 1 : 0), 300);
+  }, [open])
+
+  useEffect(() => {
     if (code) signInUser(code);
   }, [code])
 
