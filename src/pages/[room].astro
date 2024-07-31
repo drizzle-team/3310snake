@@ -90,7 +90,7 @@ const { room } = Astro.params;
 		align-items: center;
 		justify-content: center;
 		width: 100vw;
-		height: 100vh;
+		height: calc(100vh + 1px);
 		max-height: 1200px;
 		overflow: hidden;
 	}
@@ -199,6 +199,11 @@ const { room } = Astro.params;
 		position: fixed;
 		bottom: 16px;
 		right: 16px;
+		text-shadow: #fff 1px 0 0, #fff -1px 0 0, #fff 0 1px 0, #fff 0 -1px 0;
+	}
+
+	.made-by * {
+		font-size: 12px;
 		text-shadow: #fff 1px 0 0, #fff -1px 0 0, #fff 0 1px 0, #fff 0 -1px 0;
 	}
 </style>
